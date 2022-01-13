@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "431148629231",
+    "project_id": "optical-legend-120715",
+    "storage_bucket": "optical-legend-120715.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:431148629231:android:177175a099e29bf1f8ef1a",
+        "android_client_info": {
+          "package_name": "com.mtm.uber_mimic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "431148629231-3donsgnrhpvcs6clgellq1p2vanelsml.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxpAdTKcxuoHXMjMHKPjJzDYWTRlpX0tQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "431148629231-3donsgnrhpvcs6clgellq1p2vanelsml.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:431148629231:android:e0aaf03fdd3b37a5f8ef1a",
+        "android_client_info": {
+          "package_name": "com.yasser.sewing"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "431148629231-3donsgnrhpvcs6clgellq1p2vanelsml.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxpAdTKcxuoHXMjMHKPjJzDYWTRlpX0tQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "431148629231-3donsgnrhpvcs6clgellq1p2vanelsml.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
