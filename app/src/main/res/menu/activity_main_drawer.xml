@@ -7,10 +7,10 @@
         <item
             android:id="@+id/nav_your_trips"
             android:icon="@android:drawable/ic_menu_gallery"
-            android:title="@string/menu_home" />
+            android:title="@string/your_trips" />
         <item
             android:id="@+id/nav_settings"
             android:icon="@android:drawable/ic_menu_call"
-            android:title="@string/menu_gallery" />
+            android:title="@string/settings" />
     </group>
 </menu>

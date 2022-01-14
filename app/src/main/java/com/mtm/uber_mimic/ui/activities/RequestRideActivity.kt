@@ -1,6 +1,7 @@
 package com.mtm.uber_mimic.ui.activities
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -10,6 +11,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
 import com.mtm.uber_mimic.R
 import com.mtm.uber_mimic.databinding.ActivityRequestRideBinding
+import com.mtm.uber_mimic.ui.closeKeyboard
+import com.mtm.uber_mimic.ui.gone
 import com.mtm.uber_mimic.ui.hide
 import com.mtm.uber_mimic.ui.show
 import com.mtm.uber_mimic.ui.viewmodel.LocationViewState
@@ -18,6 +21,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.androidx.scope.activityScope
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.scope.Scope
+
 
 class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
 
@@ -52,9 +56,25 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
             }
             return@setNavigationItemSelectedListener true
         }
+
+        val onEditTextClickListener: (View) -> Unit = {
+            binding.ivBack.show()
+            binding.ivSideMenu.gone()
+        }
+
+        binding.editSource.setOnClickListener(onEditTextClickListener)
+        binding.editDestination.setOnClickListener(onEditTextClickListener)
+
     }
 
     private fun initObservables() {
+        binding.layoutTouchInterceptor.isViewTouchedLiveData.observe(this) { isTouched ->
+            if (isTouched) {
+                binding.ivSideMenu.show()
+                binding.ivBack.gone()
+                closeKeyboard()
+            }
+        }
         viewModel.locationViewState.observe(this) {
             setViewState(it)
         }

@@ -18,15 +18,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <com.mtm.uber_mimic.ui.widgets.TouchableWrapperView
+            android:id="@+id/layout_touch_interceptor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="40dp"
             android:layout_marginEnd="20dp"
+            android:background="@drawable/bg_request_ride_toolbar"
             android:orientation="vertical"
             android:padding="20dp"
-            android:background="@color/color_main"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
@@ -34,13 +39,57 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:background="@drawable/bg_side_menu"
-                android:src="@drawable/ic_hamburger_menu" />
+                android:src="@drawable/ic_hamburger_menu"
+                tools:ignore="ContentDescription" />
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/bg_side_menu"
+                android:src="@drawable/ic_back"
+                android:visibility="gone"
+                tools:ignore="ContentDescription" />
+
+            <EditText
+                android:id="@+id/edit_source"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_edit_text"
+                android:hint="@string/source"
+                android:inputType="text"
+                android:paddingStart="10dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:textColor="@android:color/black"
+                android:textColorHint="@color/color_main"
+                tools:ignore="Autofill" />
+
+            <EditText
+                android:id="@+id/edit_destination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_edit_text"
+                android:hint="@string/destination"
+                android:inputType="text"
+                android:paddingStart="10dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="5dp"
+                android:textColor="@android:color/black"
+                android:textColorHint="@color/color_main"
+                tools:ignore="Autofill" />
+
         </LinearLayout>
 
         <ProgressBar
             android:id="@+id/progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
