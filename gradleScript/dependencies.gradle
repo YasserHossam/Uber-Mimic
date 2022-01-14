@@ -22,6 +22,8 @@ ext {
 
     timberVersion = "5.0.1"
 
+    firebaseBomVersion = "29.0.0"
+
     //Support Libraries dependencies
     appDependencies = [
             // Foundation
@@ -39,7 +41,6 @@ ext {
             // LifeCycle
             viewModel         : "androidx.lifecycle:lifecycle-viewmodel-ktx:${viewModelVersion}",
 
-            // Play Services
             // Maps
             maps              : "com.google.android.gms:play-services-maps:${mapsVersion}",
             location          : "com.google.android.gms:play-services-location:${locationVersion}",
@@ -52,6 +53,12 @@ ext {
 
             // Logging
             timber            : "com.jakewharton.timber:timber:${timberVersion}",
+
+            // Firebase
+            firebaseBom       : "com.google.firebase:firebase-bom:${firebaseBomVersion}",
+
+            // Firestore
+            firestoreKtx      : "com.google.firebase:firebase-firestore-ktx"
 
     ]
 }
