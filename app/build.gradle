@@ -40,6 +40,26 @@ dependencies {
     implementation appDependencies.appCompat
     implementation appDependencies.material
     implementation appDependencies.constraintLayout
+
+    // Coroutines
+    implementation appDependencies.coroutines
+
+    // LifeCycle
+    implementation appDependencies.viewModel
+
+
+    // Maps and Location
     implementation appDependencies.maps
+    implementation appDependencies.location
+
+    // Permissions
+    implementation appDependencies.permissionsChecker
+
+    // Dependency Injection (Koin)
+    implementation appDependencies.koin
+
+    // Logging
+    implementation appDependencies.timber
+
 
 }
