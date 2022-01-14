@@ -4,13 +4,13 @@ import androidx.annotation.Keep
 import com.google.firebase.firestore.PropertyName
 
 @Keep
-data class FirestoreSource(
+class FirestoreSource {
     @PropertyName("name")
-    var name: String,
+    var name: String = ""
 
     @PropertyName("latitude")
-    var latitude: Double,
+    var latitude: Double = 0.0
 
     @PropertyName("longitude")
-    var longitude: Double
-)
+    var longitude: Double = 0.0
+}

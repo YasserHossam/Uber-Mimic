@@ -5,6 +5,7 @@ import com.mtm.uber_mimic.domain.models.Source
 import com.mtm.uber_mimic.domain.repo.SourceRepository
 import com.mtm.uber_mimic.scheduler.SchedulerProvider
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class GetSourcesUseCase(
     private val sourceRepository: SourceRepository,
@@ -18,6 +19,7 @@ class GetSourcesUseCase(
                 else
                     sourceRepository.searchSources(keyword)
             } catch (throwable: Throwable) {
+                Timber.e(throwable)
                 throw GetSourcesException()
             }
         }

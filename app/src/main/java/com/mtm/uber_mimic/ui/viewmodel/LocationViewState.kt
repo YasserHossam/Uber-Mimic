@@ -1,16 +1,12 @@
 package com.mtm.uber_mimic.ui.viewmodel
 
-import com.google.android.gms.maps.model.LatLng
+import com.mtm.uber_mimic.ui.models.LocationModel
 
 sealed class LocationViewState {
 
     object Loading : LocationViewState()
 
-    class Data(val latLng: LatLng) : LocationViewState()
+    class Data(val locations: List<LocationModel>) : LocationViewState()
 
-    sealed class Error: LocationViewState() {
-        object Permission : Error()
-
-        object Unknown : Error()
-    }
+    object Error : LocationViewState()
 }

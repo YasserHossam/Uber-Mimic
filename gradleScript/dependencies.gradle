@@ -24,6 +24,8 @@ ext {
 
     firebaseBomVersion = "29.0.0"
 
+    googleServicesVersion = "4.3.10"
+
     //Support Libraries dependencies
     appDependencies = [
             // Foundation
@@ -40,6 +42,9 @@ ext {
 
             // LifeCycle
             viewModel         : "androidx.lifecycle:lifecycle-viewmodel-ktx:${viewModelVersion}",
+
+            //Google services
+            googleServices    : "com.google.gms:google-services:${googleServicesVersion}",
 
             // Maps
             maps              : "com.google.android.gms:play-services-maps:${mapsVersion}",

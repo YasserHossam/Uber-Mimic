@@ -5,16 +5,19 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
 import com.mtm.uber_mimic.R
 import com.mtm.uber_mimic.databinding.ActivityRequestRideBinding
+import com.mtm.uber_mimic.ui.adapter.LocationAdapter
 import com.mtm.uber_mimic.ui.closeKeyboard
 import com.mtm.uber_mimic.ui.gone
 import com.mtm.uber_mimic.ui.hide
 import com.mtm.uber_mimic.ui.show
+import com.mtm.uber_mimic.ui.viewmodel.CurrentLocationViewState
 import com.mtm.uber_mimic.ui.viewmodel.LocationViewState
 import com.mtm.uber_mimic.ui.viewmodel.RequestRideViewModel
 import org.koin.android.scope.AndroidScopeComponent
@@ -32,6 +35,10 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
 
     private val viewModel: RequestRideViewModel by viewModel()
 
+    private val sourcesAdapter: LocationAdapter by lazy {
+        LocationAdapter { binding.editSource.setText(it.name) }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -41,12 +48,20 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
         initListeners()
         initObservables()
         initMap()
+        initRecycler()
 
     }
 
     private fun initListeners() {
         binding.ivSideMenu.setOnClickListener {
             binding.drawerView.openDrawer(GravityCompat.START)
+        }
+
+        binding.ivBack.setOnClickListener {
+            binding.ivSideMenu.show()
+            binding.ivBack.gone()
+            binding.recyclerLocation.hide()
+            closeKeyboard()
         }
 
         binding.navView.setNavigationItemSelectedListener {
@@ -60,11 +75,12 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
         val onEditTextClickListener: (View) -> Unit = {
             binding.ivBack.show()
             binding.ivSideMenu.gone()
+            if (it.id == binding.editSource.id)
+                viewModel.getSources()
         }
 
         binding.editSource.setOnClickListener(onEditTextClickListener)
         binding.editDestination.setOnClickListener(onEditTextClickListener)
-
     }
 
     private fun initObservables() {
@@ -72,11 +88,16 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
             if (isTouched) {
                 binding.ivSideMenu.show()
                 binding.ivBack.gone()
+                binding.recyclerLocation.hide()
                 closeKeyboard()
             }
         }
-        viewModel.locationViewState.observe(this) {
-            setViewState(it)
+        viewModel.currentLocationViewState.observe(this) {
+            setCurrentLocationViewState(it)
+        }
+
+        viewModel.sourcesViewState.observe(this) {
+            setSourcesViewState(it)
         }
     }
 
@@ -89,26 +110,50 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
         }
     }
 
-    private fun setViewState(viewState: LocationViewState) {
+    private fun initRecycler() {
+        binding.recyclerLocation.layoutManager = LinearLayoutManager(this)
+    }
+
+    private fun setCurrentLocationViewState(viewState: CurrentLocationViewState) {
         hideLoadingState()
         when (viewState) {
-            is LocationViewState.Data -> setLocationDataState(viewState)
-            is LocationViewState.Error -> setLocationErrorState(viewState)
-            is LocationViewState.Loading -> setLoadingState()
+            is CurrentLocationViewState.Data -> setCurrentLocationDataState(viewState)
+            is CurrentLocationViewState.Error -> setCurrentLocationErrorState(viewState)
+            is CurrentLocationViewState.Loading -> setLoadingState()
         }
     }
 
-    private fun setLocationDataState(viewState: LocationViewState.Data) {
+    private fun setCurrentLocationDataState(viewState: CurrentLocationViewState.Data) {
         mMap.addMarker(MarkerOptions().position(viewState.latLng).title("Your Location"))
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(viewState.latLng, 16f))
     }
 
-    private fun setLocationErrorState(viewState: LocationViewState.Error) {
+    private fun setCurrentLocationErrorState(viewState: CurrentLocationViewState.Error) {
         val errorMessage = when (viewState) {
-            LocationViewState.Error.Permission -> getString(R.string.permission_error)
-            LocationViewState.Error.Unknown -> getString(R.string.unknown_error)
+            CurrentLocationViewState.Error.Permission -> getString(R.string.permission_error)
+            CurrentLocationViewState.Error.Unknown -> getString(R.string.unknown_error)
         }
         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
+    }
+
+    private fun setSourcesViewState(locationViewState: LocationViewState) {
+        hideLoadingState()
+        when (locationViewState) {
+            is LocationViewState.Data -> setLocationDataState(locationViewState)
+            is LocationViewState.Error -> setLocationErrorState(locationViewState)
+            is LocationViewState.Loading -> setLoadingState()
+        }
+    }
+
+    private fun setLocationDataState(locationViewState: LocationViewState.Data) {
+        binding.recyclerLocation.show()
+        sourcesAdapter.submitList(locationViewState.locations)
+        binding.recyclerLocation.adapter = sourcesAdapter
+    }
+
+    private fun setLocationErrorState(locationViewState: LocationViewState.Error) {
+        val text = getString(R.string.get_source_error)
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show()
     }
 
     private fun setLoadingState() {

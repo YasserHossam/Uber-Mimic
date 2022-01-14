@@ -70,5 +70,6 @@ dependencies {
     // Firestore
     implementation appDependencies.firestoreKtx
 
-
 }
+
+apply plugin: 'com.google.gms.google-services'
