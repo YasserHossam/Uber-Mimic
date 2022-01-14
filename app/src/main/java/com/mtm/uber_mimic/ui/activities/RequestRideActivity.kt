@@ -1,9 +1,9 @@
 package com.mtm.uber_mimic.ui.activities
 
-import android.opengl.Visibility
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -34,10 +34,24 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
         binding = ActivityRequestRideBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
+        initListeners()
         initObservables()
         initMap()
 
+    }
+
+    private fun initListeners() {
+        binding.ivSideMenu.setOnClickListener {
+            binding.drawerView.openDrawer(GravityCompat.START)
+        }
+
+        binding.navView.setNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.nav_your_trips -> YourTripsActivity.start(this@RequestRideActivity)
+                R.id.nav_settings -> SettingsActivity.start(this@RequestRideActivity)
+            }
+            return@setNavigationItemSelectedListener true
+        }
     }
 
     private fun initObservables() {
@@ -60,7 +74,7 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
         when (viewState) {
             is LocationViewState.Data -> setLocationDataState(viewState)
             is LocationViewState.Error -> setLocationErrorState(viewState)
-            is LocationViewState.Loading -> setLoadingState(viewState)
+            is LocationViewState.Loading -> setLoadingState()
         }
     }
 
@@ -77,7 +91,7 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
         Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
     }
 
-    private fun setLoadingState(viewState: LocationViewState.Loading) {
+    private fun setLoadingState() {
         binding.progress.show()
     }
 
