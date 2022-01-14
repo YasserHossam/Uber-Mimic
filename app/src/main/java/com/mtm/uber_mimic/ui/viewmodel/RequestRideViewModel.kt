@@ -8,7 +8,10 @@ import com.mtm.uber_mimic.domain.usecase.GetSourcesUseCase
 import com.mtm.uber_mimic.tools.location.LocationHelper
 import com.mtm.uber_mimic.tools.location.exceptions.LocationPermissionException
 import com.mtm.uber_mimic.ui.models.mappers.LocationModelMapper
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class RequestRideViewModel(
     private val locationHelper: LocationHelper,
@@ -43,14 +46,17 @@ class RequestRideViewModel(
 
     val sourcesViewState: LiveData<LocationViewState> = _sourcesViewState
 
+    private var getSourcesJob: Job? = null
     fun getSources(keyword: String = "") {
+        getSourcesJob?.cancel()
         _sourcesViewState.postValue(LocationViewState.Loading)
-        viewModelScope.launch {
+        getSourcesJob = viewModelScope.launch {
             try {
                 val sources = locationModelMapper.transform(getSourcesUseCase(keyword))
                 _sourcesViewState.postValue(LocationViewState.Data(sources))
             } catch (throwable: Throwable) {
-                _sourcesViewState.postValue(LocationViewState.Error)
+                if (throwable !is CancellationException)
+                    _sourcesViewState.postValue(LocationViewState.Error)
             }
         }
     }

@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -36,7 +37,13 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
     private val viewModel: RequestRideViewModel by viewModel()
 
     private val sourcesAdapter: LocationAdapter by lazy {
-        LocationAdapter { binding.editSource.setText(it.name) }
+        LocationAdapter {
+            binding.editSource.apply {
+                setText(it.name)
+                setSelection(length())
+                binding.editDestination.requestFocus()
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,15 +79,19 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
             return@setNavigationItemSelectedListener true
         }
 
-        val onEditTextClickListener: (View) -> Unit = {
+        val onEditTextClickListener: (View) -> Unit = { view ->
             binding.ivBack.show()
             binding.ivSideMenu.gone()
-            if (it.id == binding.editSource.id)
+            if (view.id == binding.editSource.id)
                 viewModel.getSources()
         }
 
         binding.editSource.setOnClickListener(onEditTextClickListener)
         binding.editDestination.setOnClickListener(onEditTextClickListener)
+
+        binding.editSource.doOnTextChanged { text, _, _, _ ->
+            viewModel.getSources(text.toString())
+        }
     }
 
     private fun initObservables() {

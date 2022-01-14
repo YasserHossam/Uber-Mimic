@@ -13,7 +13,7 @@ class FirestoreSourceRepository(private val firestoreSourceMapper: FirestoreSour
 
     override suspend fun getSources(): List<Source> {
         val db = Firebase.firestore
-        val task = db.collection(COLLECTION_NAME).limit(10).get()
+        val task = db.collection(COLLECTION_NAME).limit(MAX_RESULTS_COUNT).get()
         val result = Tasks.await(task)
         val returnedList = mutableListOf<Source>()
         for (document in result.documents) {
@@ -25,18 +25,22 @@ class FirestoreSourceRepository(private val firestoreSourceMapper: FirestoreSour
 
     override suspend fun searchSources(keyword: String): List<Source> {
         val db = Firebase.firestore
-        val task = db.collection(COLLECTION_NAME).limit(10).get()
+        val task = db.collection(COLLECTION_NAME).limit(MAX_RESULTS_COUNT).get()
         val result = Tasks.await(task)
         val returnedList = mutableListOf<Source>()
         for (document in result.documents) {
             val source = document.toObject(FirestoreSource::class.java)
-            source?.let { returnedList.add(firestoreSourceMapper.transform(it, document.id)) }
+            val domainSource = source?.let { firestoreSourceMapper.transform(it, document.id) }
+            domainSource?.let {
+                if (it.name.lowercase().contains(keyword.lowercase()))
+                    returnedList.add(it)
+            }
         }
         return returnedList
     }
 
     companion object {
-        private const val MAX_RESULTS_COUNT = 10
+        private const val MAX_RESULTS_COUNT = 10L
         private const val COLLECTION_NAME = "Source"
     }
 }
