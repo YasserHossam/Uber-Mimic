@@ -1,0 +1,27 @@
+ext {
+    //Versions
+    recyclerViewVersion = '1.2.1'
+    coreKtxVersion = "1.7.0"
+    appCompatVersion = "1.4.0"
+    constraintLayoutVersion = "2.1.2"
+    mapsVersion = "18.0.2"
+
+    //Support Libraries dependencies
+    appDependencies = [
+            // Foundation
+            coreKtx          :         "androidx.core:core-ktx:${coreKtxVersion}",
+            appCompat        :         "androidx.appcompat:appcompat:${appCompatVersion}",
+
+            // UI
+            recyclerView     :         "androidx.recyclerview:recyclerview:${recyclerViewVersion}",
+            material         :         "com.google.android.material:material:${appCompatVersion}",
+            constraintLayout :         "androidx.constraintlayout:constraintlayout:${constraintLayoutVersion}",
+
+            // Play Services
+            // Maps
+            maps             :         "com.google.android.gms:play-services-maps:${mapsVersion}",
+
+
+
+    ]
+}
