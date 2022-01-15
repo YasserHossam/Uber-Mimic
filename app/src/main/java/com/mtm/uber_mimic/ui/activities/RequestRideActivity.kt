@@ -119,7 +119,7 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
         binding.editDestination.setOnClickListener {
             if (it.isFocused) {
                 startWatchingDestinationField()
-                getLocations(it, binding.editSource.text.toString())
+                getLocations(it, binding.editDestination.text.toString())
             } else
                 stopWatchingDestinationField()
         }
