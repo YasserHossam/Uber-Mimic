@@ -3,34 +3,34 @@ package com.mtm.uber_mimic.data
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.mtm.uber_mimic.data.mappers.FirestoreSourceMapper
-import com.mtm.uber_mimic.data.models.FirestoreSource
-import com.mtm.uber_mimic.domain.models.Source
-import com.mtm.uber_mimic.domain.repo.SourceRepository
+import com.mtm.uber_mimic.data.mappers.FirestoreLocationMapper
+import com.mtm.uber_mimic.data.models.FirestoreLocation
+import com.mtm.uber_mimic.domain.models.Location
+import com.mtm.uber_mimic.domain.repo.LocationRepository
 
-class FirestoreSourceRepository(private val firestoreSourceMapper: FirestoreSourceMapper) :
-    SourceRepository {
+class FirestoreLocationRepository(private val firestoreLocationMapper: FirestoreLocationMapper) :
+    LocationRepository {
 
-    override suspend fun getSources(): List<Source> {
+    override suspend fun getLocations(): List<Location> {
         val db = Firebase.firestore
         val task = db.collection(COLLECTION_NAME).limit(MAX_RESULTS_COUNT).get()
         val result = Tasks.await(task)
-        val returnedList = mutableListOf<Source>()
+        val returnedList = mutableListOf<Location>()
         for (document in result.documents) {
-            val source = document.toObject(FirestoreSource::class.java)
-            source?.let { returnedList.add(firestoreSourceMapper.transform(it, document.id)) }
+            val source = document.toObject(FirestoreLocation::class.java)
+            source?.let { returnedList.add(firestoreLocationMapper.transform(it, document.id)) }
         }
         return returnedList
     }
 
-    override suspend fun searchSources(keyword: String): List<Source> {
+    override suspend fun searchLocations(keyword: String): List<Location> {
         val db = Firebase.firestore
         val task = db.collection(COLLECTION_NAME).limit(MAX_RESULTS_COUNT).get()
         val result = Tasks.await(task)
-        val returnedList = mutableListOf<Source>()
+        val returnedList = mutableListOf<Location>()
         for (document in result.documents) {
-            val source = document.toObject(FirestoreSource::class.java)
-            val domainSource = source?.let { firestoreSourceMapper.transform(it, document.id) }
+            val source = document.toObject(FirestoreLocation::class.java)
+            val domainSource = source?.let { firestoreLocationMapper.transform(it, document.id) }
             domainSource?.let {
                 if (it.name.lowercase().contains(keyword.lowercase()))
                     returnedList.add(it)

@@ -4,18 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mtm.uber_mimic.domain.usecase.GetSourcesUseCase
+import com.mtm.uber_mimic.domain.usecase.DefaultGetLocationsUseCase
+import com.mtm.uber_mimic.domain.usecase.GetLocationsUseCase
 import com.mtm.uber_mimic.tools.location.LocationHelper
 import com.mtm.uber_mimic.tools.location.exceptions.LocationPermissionException
 import com.mtm.uber_mimic.ui.models.mappers.LocationModelMapper
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class RequestRideViewModel(
     private val locationHelper: LocationHelper,
-    private val getSourcesUseCase: GetSourcesUseCase,
+    private val getLocationsUseCase: GetLocationsUseCase,
     private val locationModelMapper: LocationModelMapper
 ) : ViewModel() {
 
@@ -52,7 +52,7 @@ class RequestRideViewModel(
         _sourcesViewState.postValue(LocationViewState.Loading)
         getSourcesJob = viewModelScope.launch {
             try {
-                val sources = locationModelMapper.transform(getSourcesUseCase(keyword))
+                val sources = locationModelMapper.transform(getLocationsUseCase(keyword))
                 _sourcesViewState.postValue(LocationViewState.Data(sources))
             } catch (throwable: Throwable) {
                 if (throwable !is CancellationException)

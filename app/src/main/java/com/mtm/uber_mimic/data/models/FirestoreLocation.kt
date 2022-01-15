@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.google.firebase.firestore.PropertyName
 
 @Keep
-class FirestoreSource {
+class FirestoreLocation {
     @PropertyName("name")
     var name: String = ""
 

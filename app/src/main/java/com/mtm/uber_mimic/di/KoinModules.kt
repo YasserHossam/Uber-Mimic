@@ -1,10 +1,11 @@
 package com.mtm.uber_mimic.di
 
-import com.mtm.uber_mimic.data.FirestoreSourceRepository
-import com.mtm.uber_mimic.data.mappers.DefaultFirestoreSourceMapper
-import com.mtm.uber_mimic.data.mappers.FirestoreSourceMapper
-import com.mtm.uber_mimic.domain.repo.SourceRepository
-import com.mtm.uber_mimic.domain.usecase.GetSourcesUseCase
+import com.mtm.uber_mimic.data.FirestoreLocationRepository
+import com.mtm.uber_mimic.data.mappers.DefaultFirestoreLocationMapper
+import com.mtm.uber_mimic.data.mappers.FirestoreLocationMapper
+import com.mtm.uber_mimic.domain.repo.LocationRepository
+import com.mtm.uber_mimic.domain.usecase.DefaultGetLocationsUseCase
+import com.mtm.uber_mimic.domain.usecase.GetLocationsUseCase
 import com.mtm.uber_mimic.scheduler.DefaultSchedulerProvider
 import com.mtm.uber_mimic.scheduler.SchedulerProvider
 import com.mtm.uber_mimic.tools.location.DefaultLocationHelper
@@ -23,11 +24,11 @@ val mainModule = module {
 val requestRideModule = module {
     scope<RequestRideActivity> {
         /* Repos */
-        factory<FirestoreSourceMapper> { DefaultFirestoreSourceMapper }
-        factory<SourceRepository> { FirestoreSourceRepository(get()) }
+        factory<FirestoreLocationMapper> { DefaultFirestoreLocationMapper }
+        factory<LocationRepository> { FirestoreLocationRepository(get()) }
 
         /* Use cases */
-        factory { GetSourcesUseCase(get(), get()) }
+        factory<GetLocationsUseCase> { DefaultGetLocationsUseCase(get(), get()) }
 
         /* Helpers */
         scoped<LocationHelper> { DefaultLocationHelper(get<RequestRideActivity>()) }
