@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -79,6 +80,15 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
         initMap()
         initRecycler()
 
+    }
+
+    override fun onBackPressed() {
+        if (binding.ivBack.isVisible) {
+            binding.ivBack.gone()
+            binding.ivSideMenu.show()
+            binding.recyclerLocation.gone()
+        } else
+            super.onBackPressed()
     }
 
     private fun initListeners() {
