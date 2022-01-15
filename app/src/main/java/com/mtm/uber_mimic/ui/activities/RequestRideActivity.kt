@@ -2,8 +2,10 @@ package com.mtm.uber_mimic.ui.activities
 
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -68,7 +70,10 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
 
         binding = ActivityRequestRideBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+        )
         initListeners()
         initObservables()
         initMap()
