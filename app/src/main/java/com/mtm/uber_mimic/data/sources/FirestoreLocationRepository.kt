@@ -1,14 +1,14 @@
-package com.mtm.uber_mimic.data
+package com.mtm.uber_mimic.data.sources
 
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.mtm.uber_mimic.data.mappers.FirestoreLocationMapper
-import com.mtm.uber_mimic.data.models.FirestoreLocation
+import com.mtm.uber_mimic.data.sources.mappers.FirestoreLocationMapper
+import com.mtm.uber_mimic.data.sources.models.FirestoreLocation
 import com.mtm.uber_mimic.domain.models.Location
 import com.mtm.uber_mimic.domain.repo.LocationRepository
 
-class FirestoreLocationRepository(private val firestoreLocationMapper: FirestoreLocationMapper) :
+class FirestoreLocationRepository(private val mapper: FirestoreLocationMapper) :
     LocationRepository {
 
     override suspend fun getLocations(): List<Location> {
@@ -18,7 +18,7 @@ class FirestoreLocationRepository(private val firestoreLocationMapper: Firestore
         val returnedList = mutableListOf<Location>()
         for (document in result.documents) {
             val source = document.toObject(FirestoreLocation::class.java)
-            source?.let { returnedList.add(firestoreLocationMapper.transform(it, document.id)) }
+            source?.let { returnedList.add(mapper.transform(it, document.id)) }
         }
         return returnedList
     }
@@ -30,7 +30,7 @@ class FirestoreLocationRepository(private val firestoreLocationMapper: Firestore
         val returnedList = mutableListOf<Location>()
         for (document in result.documents) {
             val source = document.toObject(FirestoreLocation::class.java)
-            val domainSource = source?.let { firestoreLocationMapper.transform(it, document.id) }
+            val domainSource = source?.let { mapper.transform(it, document.id) }
             domainSource?.let {
                 if (it.name.lowercase().contains(keyword.lowercase()))
                     returnedList.add(it)

@@ -1,8 +1,8 @@
 package com.mtm.uber_mimic.di
 
-import com.mtm.uber_mimic.data.FirestoreLocationRepository
-import com.mtm.uber_mimic.data.mappers.DefaultFirestoreLocationMapper
-import com.mtm.uber_mimic.data.mappers.FirestoreLocationMapper
+import com.mtm.uber_mimic.data.sources.FirestoreLocationRepository
+import com.mtm.uber_mimic.data.sources.mappers.DefaultFirestoreLocationMapper
+import com.mtm.uber_mimic.data.sources.mappers.FirestoreLocationMapper
 import com.mtm.uber_mimic.domain.repo.LocationRepository
 import com.mtm.uber_mimic.domain.usecase.DefaultGetLocationsUseCase
 import com.mtm.uber_mimic.domain.usecase.GetLocationsUseCase

@@ -26,6 +26,12 @@ ext {
 
     googleServicesVersion = "4.3.10"
 
+    retrofitVersion = "2.6.0"
+
+    gsonVersion = "2.8.5"
+    retrofitGsonVersion = "2.5.0"
+    retrofitLoggingVersion = "3.12.0"
+
     //Support Libraries dependencies
     appDependencies = [
             // Foundation
@@ -63,7 +69,15 @@ ext {
             firebaseBom       : "com.google.firebase:firebase-bom:${firebaseBomVersion}",
 
             // Firestore
-            firestoreKtx      : "com.google.firebase:firebase-firestore-ktx"
+            firestoreKtx      : "com.google.firebase:firebase-firestore-ktx",
+
+            // Networking
+            retrofit          : "com.squareup.retrofit2:retrofit:${retrofitVersion}",
+            gson              : "com.google.code.gson:gson:${gsonVersion}",
+            retrofitGson      : "com.squareup.retrofit2:converter-gson:${retrofitGsonVersion}",
+            retrofitLogging   : "com.squareup.okhttp3:logging-interceptor:${retrofitLoggingVersion}"
+
+
 
     ]
 }

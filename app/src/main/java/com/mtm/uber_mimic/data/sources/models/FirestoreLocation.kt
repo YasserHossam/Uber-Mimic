@@ -1,4 +1,4 @@
-package com.mtm.uber_mimic.data.models
+package com.mtm.uber_mimic.data.sources.models
 
 import androidx.annotation.Keep
 import com.google.firebase.firestore.PropertyName

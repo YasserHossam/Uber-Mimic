@@ -60,15 +60,18 @@ dependencies {
 
     // Logging
     implementation appDependencies.timber
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.0'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
 
     // Firebase
     implementation platform(appDependencies.firebaseBom)
 
     // Firestore
     implementation appDependencies.firestoreKtx
+
+    // Networking
+    implementation appDependencies.retrofit
+    implementation appDependencies.gson
+    implementation appDependencies.retrofitGson
+    implementation appDependencies.retrofitLogging
 
 }
 
