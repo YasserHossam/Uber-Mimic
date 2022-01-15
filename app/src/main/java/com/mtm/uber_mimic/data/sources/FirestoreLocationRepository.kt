@@ -1,15 +1,42 @@
 package com.mtm.uber_mimic.data.sources
 
+import android.annotation.SuppressLint
+import android.content.Context
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.mtm.uber_mimic.data.exceptions.GetCurrentLocationException
 import com.mtm.uber_mimic.data.sources.mappers.FirestoreLocationMapper
 import com.mtm.uber_mimic.data.sources.models.FirestoreLocation
+import com.mtm.uber_mimic.domain.models.LatLng
 import com.mtm.uber_mimic.domain.models.Location
 import com.mtm.uber_mimic.domain.repo.LocationRepository
+import com.mtm.uber_mimic.scheduler.SchedulerProvider
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
-class FirestoreLocationRepository(private val mapper: FirestoreLocationMapper) :
+class FirestoreLocationRepository(
+    context: Context,
+    private val mapper: FirestoreLocationMapper,
+    private val schedulerProvider: SchedulerProvider
+) :
     LocationRepository {
+
+    private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+    @SuppressLint("MissingPermission")
+    override suspend fun getCurrentLocation(): LatLng {
+        return withContext(schedulerProvider.io()) {
+            try {
+                val lastLocation = Tasks.await(fusedLocationClient.lastLocation)
+                return@withContext LatLng(lastLocation.latitude, lastLocation.longitude)
+            } catch (throwable: Throwable) {
+                Timber.e(throwable)
+                throw GetCurrentLocationException()
+            }
+        }
+    }
 
     override suspend fun getLocations(): List<Location> {
         val db = Firebase.firestore

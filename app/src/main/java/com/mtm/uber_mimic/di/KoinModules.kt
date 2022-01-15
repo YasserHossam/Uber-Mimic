@@ -12,20 +12,17 @@ import com.mtm.uber_mimic.data.sources.mappers.DefaultFirestoreLocationMapper
 import com.mtm.uber_mimic.data.sources.mappers.FirestoreLocationMapper
 import com.mtm.uber_mimic.domain.repo.DriversRepository
 import com.mtm.uber_mimic.domain.repo.LocationRepository
-import com.mtm.uber_mimic.domain.usecase.DefaultGetLocationsUseCase
-import com.mtm.uber_mimic.domain.usecase.DefaultGetNearestDriversUseCase
-import com.mtm.uber_mimic.domain.usecase.GetLocationsUseCase
-import com.mtm.uber_mimic.domain.usecase.GetNearestDriversUseCase
+import com.mtm.uber_mimic.domain.usecase.*
 import com.mtm.uber_mimic.scheduler.DefaultSchedulerProvider
 import com.mtm.uber_mimic.scheduler.SchedulerProvider
-import com.mtm.uber_mimic.tools.location.DefaultLocationHelper
-import com.mtm.uber_mimic.tools.location.LocationHelper
 import com.mtm.uber_mimic.ui.activities.RequestRideActivity
+import com.mtm.uber_mimic.ui.helper.PermissionHelper
 import com.mtm.uber_mimic.ui.models.mappers.DefaultDriverModelMapper
 import com.mtm.uber_mimic.ui.models.mappers.DefaultLocationModelMapper
 import com.mtm.uber_mimic.ui.models.mappers.DriverModelMapper
 import com.mtm.uber_mimic.ui.models.mappers.LocationModelMapper
 import com.mtm.uber_mimic.ui.viewmodel.RequestRideViewModel
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.core.scope.get
@@ -46,7 +43,7 @@ val requestRideModule = module {
     scope<RequestRideActivity> {
 
         /* Helpers */
-        scoped<LocationHelper> { DefaultLocationHelper(get<RequestRideActivity>()) }
+        scoped { PermissionHelper(get<RequestRideActivity>()) }
 
         /* Apis */
         factory<FoursquareApi> {
@@ -56,14 +53,16 @@ val requestRideModule = module {
 
         /* Repos */
         factory<FirestoreLocationMapper> { DefaultFirestoreLocationMapper }
-        factory<LocationRepository>(named(sourceRepoName)) { FirestoreLocationRepository(get()) }
+        factory<LocationRepository>(named(sourceRepoName)) {
+            FirestoreLocationRepository(androidContext(), get(), get())
+        }
 
         factory<FirestoreDriverMapper> { DefaultFirestoreDriverMapper }
         factory<DriversRepository> { FirestoreDriverRepository(get()) }
 
         factory<FoursquareLocationMapper> { DefaultFoursquareLocationMapper }
         factory<LocationRepository>(named(destinationRepoName)) {
-            FoursquareLocationRepository(get(), get(), get())
+            FoursquareLocationRepository(get(), androidContext(), get(), get())
         }
 
         /* Use cases */
@@ -79,6 +78,10 @@ val requestRideModule = module {
             DefaultGetNearestDriversUseCase(get(), get())
         }
 
+        factory<GetCurrentLocationUseCase> {
+            DefaultGetCurrentLocationUseCase(get(named(sourceRepoName)), get())
+        }
+
         /* UI Mappers */
         factory<LocationModelMapper> { DefaultLocationModelMapper }
         factory<DriverModelMapper> { DefaultDriverModelMapper }
@@ -92,6 +95,7 @@ val requestRideModule = module {
                 get(),
                 get(),
                 get(),
+                get()
             )
         }
     }

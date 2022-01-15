@@ -4,25 +4,26 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import com.mtm.uber_mimic.domain.usecase.GetLocationsUseCase
 import com.mtm.uber_mimic.domain.usecase.GetNearestDriversUseCase
-import com.mtm.uber_mimic.tools.location.LocationHelper
-import com.mtm.uber_mimic.tools.location.exceptions.LocationPermissionException
+import com.mtm.uber_mimic.domain.usecase.GetCurrentLocationUseCase
+import com.mtm.uber_mimic.ui.helper.PermissionHelper
 import com.mtm.uber_mimic.ui.models.LocationModel
 import com.mtm.uber_mimic.ui.models.mappers.DriverModelMapper
 import com.mtm.uber_mimic.ui.models.mappers.LocationModelMapper
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.selects.select
 
 class RequestRideViewModel(
-    private val locationHelper: LocationHelper,
+    private val getCurrentLocationUseCase: GetCurrentLocationUseCase,
     private val getSourcesUseCase: GetLocationsUseCase,
     private val getDestinationsUseCase: GetLocationsUseCase,
     private val getNearestDriversUseCase: GetNearestDriversUseCase,
     private val locationModelMapper: LocationModelMapper,
-    private val driverModelMapper: DriverModelMapper
+    private val driverModelMapper: DriverModelMapper,
+    private val permissionHelper: PermissionHelper
 ) : ViewModel() {
 
     private val _currentLocationViewState: MutableLiveData<CurrentLocationViewState> by lazy {
@@ -34,13 +35,16 @@ class RequestRideViewModel(
         _currentLocationViewState.postValue(CurrentLocationViewState.Loading)
         viewModelScope.launch {
             try {
-                val latLng = locationHelper.getLocation()
-                _currentLocationViewState.postValue(CurrentLocationViewState.Data(latLng))
+                if (permissionHelper.isLocationPermissionsGranted()) {
+                    val latLng = getCurrentLocationUseCase()
+                    val googleLatLang = LatLng(latLng.lat, latLng.lng)
+                    _currentLocationViewState.postValue(CurrentLocationViewState.Data(googleLatLang))
+                } else {
+                    val error = CurrentLocationViewState.Error.Permission
+                    _currentLocationViewState.postValue(error)
+                }
             } catch (throwable: Throwable) {
-                val error = if (throwable is LocationPermissionException)
-                    CurrentLocationViewState.Error.Permission
-                else
-                    CurrentLocationViewState.Error.Unknown
+                val error = CurrentLocationViewState.Error.Unknown
                 _currentLocationViewState.postValue(error)
             }
         }
@@ -81,13 +85,25 @@ class RequestRideViewModel(
         _destinationsViewState.postValue(LocationViewState.Loading)
         getDestinationsJob = viewModelScope.launch {
             try {
-                val sources = locationModelMapper.transform(getDestinationsUseCase(keyword))
-                _destinationsViewState.postValue(
-                    LocationViewState.Data(
-                        sources,
-                        LocationType.DESTINATION
+                if (permissionHelper.isLocationPermissionsGranted()) {
+                    val sources = locationModelMapper.transform(getDestinationsUseCase(keyword))
+                    _destinationsViewState.postValue(
+                        LocationViewState.Data(
+                            sources,
+                            LocationType.DESTINATION
+                        )
                     )
-                )
+                } else {
+                    val error = CurrentLocationViewState.Error.Permission
+                    _currentLocationViewState.postValue(error)
+                    _destinationsViewState.postValue(
+                        LocationViewState.Data(
+                            emptyList(),
+                            LocationType.DESTINATION
+                        )
+                    )
+                }
+
             } catch (throwable: Throwable) {
                 if (throwable !is CancellationException)
                     _destinationsViewState.postValue(LocationViewState.Error(LocationType.DESTINATION))

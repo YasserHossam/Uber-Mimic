@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="foursquare_base_url">https://api.foursquare.com/v3/</string>
-    <string name="foursquare_api_key" templateMergeStrategy="preserve" translatable="false">fsq3SCCG/iQinld+YLEP4pm6n9VvNh/aAJFrXr5nE+7Ibj4=</string>
+    <string name="foursquare_api_key" templateMergeStrategy="preserve" translatable="false">fsq3gFtna0Xe1QZjv7hZSODcPcTqBaNNIl26ZyIrGCskHAg=</string>
 </resources>
