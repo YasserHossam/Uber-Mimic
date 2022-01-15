@@ -22,7 +22,7 @@ A simple uber-like application representing ordering a driver
 - Timber
 - PermissionsChecker
 
-## language :
+## language
 
 - Kotlin
 
