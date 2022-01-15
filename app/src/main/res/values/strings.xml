@@ -14,5 +14,6 @@
     <string name="settings">Settings</string>
     <string name="source">Source</string>
     <string name="destination">Destination</string>
-    <string name="get_source_error">Can\'t get source locations, please try again later</string>
+    <string name="get_sources_error">Can\'t get source locations, please try again later</string>
+    <string name="get_destinations_error">Can\'t get destination locations, please try again later</string>
 </resources>

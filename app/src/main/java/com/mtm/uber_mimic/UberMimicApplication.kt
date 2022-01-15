@@ -3,6 +3,7 @@ package com.mtm.uber_mimic
 import android.app.Application
 import com.google.firebase.FirebaseApp
 import com.mtm.uber_mimic.di.mainModule
+import com.mtm.uber_mimic.di.networkingModule
 import com.mtm.uber_mimic.di.requestRideModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -22,7 +23,7 @@ class UberMimicApplication : Application() {
         startKoin {
             androidLogger()
             androidContext(this@UberMimicApplication)
-            modules(mainModule, requestRideModule)
+            modules(networkingModule, mainModule, requestRideModule)
         }
     }
 }

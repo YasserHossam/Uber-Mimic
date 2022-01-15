@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mtm.uber_mimic.domain.usecase.DefaultGetLocationsUseCase
 import com.mtm.uber_mimic.domain.usecase.GetLocationsUseCase
 import com.mtm.uber_mimic.tools.location.LocationHelper
 import com.mtm.uber_mimic.tools.location.exceptions.LocationPermissionException
@@ -15,7 +14,8 @@ import kotlinx.coroutines.launch
 
 class RequestRideViewModel(
     private val locationHelper: LocationHelper,
-    private val getLocationsUseCase: GetLocationsUseCase,
+    private val getSourcesUseCase: GetLocationsUseCase,
+    private val getDestinationsUseCase: GetLocationsUseCase,
     private val locationModelMapper: LocationModelMapper
 ) : ViewModel() {
 
@@ -47,16 +47,39 @@ class RequestRideViewModel(
     val sourcesViewState: LiveData<LocationViewState> = _sourcesViewState
 
     private var getSourcesJob: Job? = null
+
     fun getSources(keyword: String = "") {
         getSourcesJob?.cancel()
         _sourcesViewState.postValue(LocationViewState.Loading)
         getSourcesJob = viewModelScope.launch {
             try {
-                val sources = locationModelMapper.transform(getLocationsUseCase(keyword))
-                _sourcesViewState.postValue(LocationViewState.Data(sources))
+                val sources = locationModelMapper.transform(getSourcesUseCase(keyword))
+                _sourcesViewState.postValue(LocationViewState.Data(sources, LocationType.SOURCE))
             } catch (throwable: Throwable) {
                 if (throwable !is CancellationException)
-                    _sourcesViewState.postValue(LocationViewState.Error)
+                    _sourcesViewState.postValue(LocationViewState.Error(LocationType.SOURCE))
+            }
+        }
+    }
+
+    private val _destinationsViewState: MutableLiveData<LocationViewState> by lazy {
+        MutableLiveData()
+    }
+
+    val destinationsViewState: LiveData<LocationViewState> = _destinationsViewState
+
+    private var getDestinationsJob: Job? = null
+
+    fun getDestinations(keyword: String = "") {
+        getDestinationsJob?.cancel()
+        _destinationsViewState.postValue(LocationViewState.Loading)
+        getDestinationsJob = viewModelScope.launch {
+            try {
+                val sources = locationModelMapper.transform(getDestinationsUseCase(keyword))
+                _destinationsViewState.postValue(LocationViewState.Data(sources, LocationType.DESTINATION))
+            } catch (throwable: Throwable) {
+                if (throwable !is CancellationException)
+                    _destinationsViewState.postValue(LocationViewState.Error(LocationType.DESTINATION))
             }
         }
     }

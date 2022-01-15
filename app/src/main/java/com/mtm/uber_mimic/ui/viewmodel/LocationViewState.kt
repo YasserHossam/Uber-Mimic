@@ -1,12 +1,19 @@
 package com.mtm.uber_mimic.ui.viewmodel
 
+import android.location.Location
 import com.mtm.uber_mimic.ui.models.LocationModel
 
 sealed class LocationViewState {
 
     object Loading : LocationViewState()
 
-    class Data(val locations: List<LocationModel>) : LocationViewState()
+    data class Data(val locations: List<LocationModel>, val type: LocationType) :
+        LocationViewState()
 
-    object Error : LocationViewState()
+    data class Error(val type: LocationType) : LocationViewState()
+}
+
+enum class LocationType {
+    SOURCE,
+    DESTINATION
 }

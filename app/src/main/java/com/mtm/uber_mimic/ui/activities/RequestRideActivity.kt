@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -13,18 +13,21 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
 import com.mtm.uber_mimic.R
 import com.mtm.uber_mimic.databinding.ActivityRequestRideBinding
+import com.mtm.uber_mimic.ui.*
 import com.mtm.uber_mimic.ui.adapter.LocationAdapter
-import com.mtm.uber_mimic.ui.closeKeyboard
-import com.mtm.uber_mimic.ui.gone
-import com.mtm.uber_mimic.ui.hide
-import com.mtm.uber_mimic.ui.show
 import com.mtm.uber_mimic.ui.viewmodel.CurrentLocationViewState
+import com.mtm.uber_mimic.ui.viewmodel.LocationType
 import com.mtm.uber_mimic.ui.viewmodel.LocationViewState
 import com.mtm.uber_mimic.ui.viewmodel.RequestRideViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.androidx.scope.activityScope
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.scope.Scope
+import timber.log.Timber
 
 
 class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
@@ -39,9 +42,24 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
     private val sourcesAdapter: LocationAdapter by lazy {
         LocationAdapter {
             binding.editSource.apply {
+                stopWatchingSourceField()
                 setText(it.name)
                 setSelection(length())
                 binding.editDestination.requestFocus()
+            }
+        }
+    }
+
+    private val destinationsAdapter: LocationAdapter by lazy {
+        LocationAdapter {
+            binding.editDestination.apply {
+                stopWatchingDestinationField()
+                setText(it.name)
+                setSelection(length())
+                binding.ivSideMenu.show()
+                binding.ivBack.gone()
+                binding.recyclerLocation.hide()
+                closeKeyboard()
             }
         }
     }
@@ -79,19 +97,45 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
             return@setNavigationItemSelectedListener true
         }
 
-        val onEditTextClickListener: (View) -> Unit = { view ->
-            binding.ivBack.show()
-            binding.ivSideMenu.gone()
-            if (view.id == binding.editSource.id)
-                viewModel.getSources()
+        binding.editSource.setOnFocusChangeListener { view, isFocused ->
+            if (isFocused) {
+                startWatchingSourceField()
+                getLocations(view, binding.editSource.text.toString())
+            } else
+                stopWatchingSourceField()
         }
 
-        binding.editSource.setOnClickListener(onEditTextClickListener)
-        binding.editDestination.setOnClickListener(onEditTextClickListener)
-
-        binding.editSource.doOnTextChanged { text, _, _, _ ->
-            viewModel.getSources(text.toString())
+        binding.editDestination.setOnFocusChangeListener { view, isFocused ->
+            if (isFocused) {
+                startWatchingDestinationField()
+                getLocations(view, binding.editDestination.text.toString())
+            } else
+                stopWatchingDestinationField()
         }
+    }
+
+    private var sourceWatchJob: Job? = null
+    private fun startWatchingSourceField() {
+        sourceWatchJob = binding.editSource.textChanges()
+            .debounce(500)
+            .onEach { getLocations(binding.editSource, binding.editSource.text.toString()) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun stopWatchingSourceField() {
+        sourceWatchJob?.cancel()
+    }
+
+    private var destinationWatchJob: Job? = null
+    private fun startWatchingDestinationField() {
+        destinationWatchJob = binding.editDestination.textChanges()
+            .debounce(500)
+            .onEach { getLocations(binding.editDestination, binding.editDestination.text.toString()) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun stopWatchingDestinationField() {
+        destinationWatchJob?.cancel()
     }
 
     private fun initObservables() {
@@ -110,6 +154,10 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
         viewModel.sourcesViewState.observe(this) {
             setSourcesViewState(it)
         }
+
+        viewModel.destinationsViewState.observe(this) {
+            setSourcesViewState(it)
+        }
     }
 
     private fun initMap() {
@@ -123,6 +171,15 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
 
     private fun initRecycler() {
         binding.recyclerLocation.layoutManager = LinearLayoutManager(this)
+    }
+
+    private fun getLocations(view: View, currentQuery: String) {
+        binding.ivBack.show()
+        binding.ivSideMenu.gone()
+        if (view.id == binding.editSource.id)
+            viewModel.getSources(currentQuery)
+        else if (view.id == binding.editDestination.id)
+            viewModel.getDestinations(currentQuery)
     }
 
     private fun setCurrentLocationViewState(viewState: CurrentLocationViewState) {
@@ -158,12 +215,20 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
 
     private fun setLocationDataState(locationViewState: LocationViewState.Data) {
         binding.recyclerLocation.show()
-        sourcesAdapter.submitList(locationViewState.locations)
-        binding.recyclerLocation.adapter = sourcesAdapter
+        if (locationViewState.type == LocationType.SOURCE) {
+            sourcesAdapter.submitList(locationViewState.locations)
+            binding.recyclerLocation.adapter = sourcesAdapter
+        } else if (locationViewState.type == LocationType.DESTINATION) {
+            destinationsAdapter.submitList(locationViewState.locations)
+            binding.recyclerLocation.adapter = destinationsAdapter
+        }
     }
 
     private fun setLocationErrorState(locationViewState: LocationViewState.Error) {
-        val text = getString(R.string.get_source_error)
+        val text = if (locationViewState.type == LocationType.SOURCE)
+            getString(R.string.get_sources_error)
+        else
+            getString(R.string.get_destinations_error)
         Toast.makeText(this, text, Toast.LENGTH_LONG).show()
     }
 

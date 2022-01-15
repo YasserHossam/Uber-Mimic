@@ -46,6 +46,7 @@ dependencies {
 
     // LifeCycle
     implementation appDependencies.viewModel
+    implementation appDependencies.lifecycle
 
 
     // Maps and Location
