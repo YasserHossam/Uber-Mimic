@@ -27,4 +27,4 @@
 
 ## Notes
 - I have used Foursquare Places API instead of Google Places API (as the latter one required billing account)
-- Place squares hasn't many places results with English, So please, Try to search for destinations in Arabic
+- Foursquare Places API hasn't many places results with English, So please, Try to search for destinations in Arabic
