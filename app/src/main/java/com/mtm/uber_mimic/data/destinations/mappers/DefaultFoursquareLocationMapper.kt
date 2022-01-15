@@ -4,7 +4,7 @@ package com.mtm.uber_mimic.data.destinations.mappers
 import com.mtm.uber_mimic.data.destinations.models.FoursquareLocation
 import com.mtm.uber_mimic.domain.models.Location
 
-class DefaultFoursquareLocationMapper : FoursquareLocationMapper {
+object DefaultFoursquareLocationMapper : FoursquareLocationMapper {
 
     override fun transform(foursquareLocation: FoursquareLocation): Location {
         return Location(

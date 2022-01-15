@@ -1,7 +1,7 @@
 package com.mtm.uber_mimic.data.destinations
 
 import com.mtm.uber_mimic.data.destinations.mappers.FoursquareLocationMapper
-import com.mtm.uber_mimic.data.destinations.models.FoursquareLocation
+import com.mtm.uber_mimic.data.destinations.models.FoursquareResponse
 import com.mtm.uber_mimic.domain.models.Location
 import com.mtm.uber_mimic.domain.repo.LocationRepository
 import com.mtm.uber_mimic.tools.location.LocationHelper
@@ -17,26 +17,26 @@ class FoursquareLocationRepository(
     override suspend fun getLocations(): List<Location> {
         val currentLocation = locationHelper.getLocation()
         val locationString = "${currentLocation.latitude},${currentLocation.longitude}"
-        val locations = foursquareApi.searchPlaces(
+        val response = foursquareApi.searchPlaces(
             latLang = locationString,
             radius = SEARCH_RADIUS
         )
-        return mapper.transform(locations)
+        return mapper.transform(response.locations)
     }
 
     override suspend fun searchLocations(keyword: String): List<Location> {
         val currentLocation = locationHelper.getLocation()
         val locationString = "${currentLocation.latitude},${currentLocation.longitude}"
-        val locations = foursquareApi.searchPlaces(
+        val response = foursquareApi.searchPlaces(
             latLang = locationString,
             radius = SEARCH_RADIUS,
             query = keyword
         )
-        return mapper.transform(locations)
+        return mapper.transform(response.locations)
     }
 
     companion object {
-        private const val SEARCH_RADIUS = 1000
+        private const val SEARCH_RADIUS = 100000
     }
 
 }
@@ -48,6 +48,6 @@ interface FoursquareApi {
         @Query("ll") latLang: String,
         @Query("radius") radius: Int,
         @Query("query") query: String? = null
-    ): List<FoursquareLocation>
+    ): FoursquareResponse
 
 }
