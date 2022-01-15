@@ -1,6 +1,6 @@
-"#MTM's tasks" 
+# MTM's tasks
 
-A simple uber-like application representing ordering a driver 
+### A simple uber-like application representing ordering a driver 
 
 ## Architecture 
 - I used MVVM alongside Clean Architecture and Repository patterns
@@ -23,7 +23,6 @@ A simple uber-like application representing ordering a driver
 - PermissionsChecker
 
 ## language
-
 - Kotlin
 
 ## Notes
