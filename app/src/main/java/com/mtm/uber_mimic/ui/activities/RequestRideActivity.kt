@@ -16,8 +16,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.mtm.uber_mimic.R
 import com.mtm.uber_mimic.databinding.ActivityRequestRideBinding
 import com.mtm.uber_mimic.ui.*
-import com.mtm.uber_mimic.ui.adapter.LocationAdapter
-import com.mtm.uber_mimic.ui.viewmodel.*
+import com.mtm.uber_mimic.ui.adapters.LocationAdapter
+import com.mtm.uber_mimic.ui.viewmodels.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn

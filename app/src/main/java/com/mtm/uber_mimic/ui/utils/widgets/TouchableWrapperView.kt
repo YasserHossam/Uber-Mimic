@@ -1,4 +1,4 @@
-package com.mtm.uber_mimic.ui.widgets
+package com.mtm.uber_mimic.ui.utils.widgets
 
 import android.content.Context
 import android.util.AttributeSet

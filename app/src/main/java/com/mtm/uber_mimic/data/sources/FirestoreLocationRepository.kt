@@ -12,7 +12,7 @@ import com.mtm.uber_mimic.data.sources.models.FirestoreLocation
 import com.mtm.uber_mimic.domain.models.LatLng
 import com.mtm.uber_mimic.domain.models.Location
 import com.mtm.uber_mimic.domain.repo.LocationRepository
-import com.mtm.uber_mimic.scheduler.SchedulerProvider
+import com.mtm.uber_mimic.common.scheduler.SchedulerProvider
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 

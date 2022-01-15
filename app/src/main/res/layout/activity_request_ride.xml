@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <com.mtm.uber_mimic.ui.widgets.TouchableWrapperView
+        <com.mtm.uber_mimic.ui.utils.widgets.TouchableWrapperView
             android:id="@+id/layout_touch_interceptor"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

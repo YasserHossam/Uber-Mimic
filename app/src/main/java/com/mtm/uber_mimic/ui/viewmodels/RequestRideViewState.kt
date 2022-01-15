@@ -1,4 +1,4 @@
-package com.mtm.uber_mimic.ui.viewmodel
+package com.mtm.uber_mimic.ui.viewmodels
 
 import com.google.android.gms.maps.model.LatLng
 import com.mtm.uber_mimic.ui.models.DriverModel

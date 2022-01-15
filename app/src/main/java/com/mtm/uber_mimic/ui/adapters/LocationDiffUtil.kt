@@ -1,4 +1,4 @@
-package com.mtm.uber_mimic.ui.adapter
+package com.mtm.uber_mimic.ui.adapters
 
 import androidx.recyclerview.widget.DiffUtil
 import com.mtm.uber_mimic.ui.models.LocationModel

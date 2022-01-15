@@ -1,4 +1,4 @@
-package com.mtm.uber_mimic.di
+package com.mtm.uber_mimic.common.di
 
 import com.mtm.uber_mimic.R
 import okhttp3.Interceptor

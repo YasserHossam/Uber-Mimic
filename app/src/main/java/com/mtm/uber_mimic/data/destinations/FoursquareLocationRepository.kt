@@ -10,7 +10,7 @@ import com.mtm.uber_mimic.data.exceptions.GetCurrentLocationException
 import com.mtm.uber_mimic.domain.models.LatLng
 import com.mtm.uber_mimic.domain.models.Location
 import com.mtm.uber_mimic.domain.repo.LocationRepository
-import com.mtm.uber_mimic.scheduler.SchedulerProvider
+import com.mtm.uber_mimic.common.scheduler.SchedulerProvider
 import kotlinx.coroutines.withContext
 import retrofit2.http.GET
 import retrofit2.http.Query

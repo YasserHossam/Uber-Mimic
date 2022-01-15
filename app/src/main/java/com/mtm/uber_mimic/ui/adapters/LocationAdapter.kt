@@ -1,4 +1,4 @@
-package com.mtm.uber_mimic.ui.adapter
+package com.mtm.uber_mimic.ui.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

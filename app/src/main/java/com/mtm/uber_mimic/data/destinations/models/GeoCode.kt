@@ -9,11 +9,3 @@ data class GeoCode(
     val latLng: FoursquareLatLng
 )
 
-@Keep
-data class FoursquareLatLng(
-    @SerializedName("latitude")
-    val latitude: Double,
-
-    @SerializedName("longitude")
-    val longitude: Double
-)

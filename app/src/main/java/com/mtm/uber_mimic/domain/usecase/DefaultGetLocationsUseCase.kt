@@ -3,10 +3,9 @@ package com.mtm.uber_mimic.domain.usecase
 import com.mtm.uber_mimic.domain.exceptions.GetLocationsException
 import com.mtm.uber_mimic.domain.models.Location
 import com.mtm.uber_mimic.domain.repo.LocationRepository
-import com.mtm.uber_mimic.scheduler.SchedulerProvider
+import com.mtm.uber_mimic.common.scheduler.SchedulerProvider
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 class DefaultGetLocationsUseCase(
     private val locationRepository: LocationRepository,

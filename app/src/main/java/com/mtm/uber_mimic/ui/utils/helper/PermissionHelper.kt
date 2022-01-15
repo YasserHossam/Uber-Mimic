@@ -1,4 +1,4 @@
-package com.mtm.uber_mimic.ui.helper
+package com.mtm.uber_mimic.ui.utils.helper
 
 import android.Manifest
 import android.content.Context

@@ -1,4 +1,4 @@
-package com.mtm.uber_mimic.scheduler
+package com.mtm.uber_mimic.common.scheduler
 
 import kotlinx.coroutines.Dispatchers
 

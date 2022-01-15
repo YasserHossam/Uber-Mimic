@@ -1,4 +1,4 @@
-package com.mtm.uber_mimic.ui.viewmodel
+package com.mtm.uber_mimic.ui.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,7 +8,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.mtm.uber_mimic.domain.usecase.GetCurrentLocationUseCase
 import com.mtm.uber_mimic.domain.usecase.GetLocationsUseCase
 import com.mtm.uber_mimic.domain.usecase.GetNearestDriversUseCase
-import com.mtm.uber_mimic.ui.helper.PermissionHelper
+import com.mtm.uber_mimic.ui.utils.helper.PermissionHelper
 import com.mtm.uber_mimic.ui.models.LocationModel
 import com.mtm.uber_mimic.ui.models.mappers.DriverModelMapper
 import com.mtm.uber_mimic.ui.models.mappers.LocationModelMapper

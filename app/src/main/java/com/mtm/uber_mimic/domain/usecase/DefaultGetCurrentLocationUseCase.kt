@@ -2,7 +2,7 @@ package com.mtm.uber_mimic.domain.usecase
 
 import com.mtm.uber_mimic.domain.models.LatLng
 import com.mtm.uber_mimic.domain.repo.LocationRepository
-import com.mtm.uber_mimic.scheduler.SchedulerProvider
+import com.mtm.uber_mimic.common.scheduler.SchedulerProvider
 import kotlinx.coroutines.withContext
 
 class DefaultGetCurrentLocationUseCase(
