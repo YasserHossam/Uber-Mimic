@@ -27,7 +27,6 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.androidx.scope.activityScope
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.scope.Scope
-import timber.log.Timber
 
 
 class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
@@ -97,6 +96,22 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
             return@setNavigationItemSelectedListener true
         }
 
+        binding.editSource.setOnClickListener {
+            if (it.isFocused) {
+                startWatchingSourceField()
+                getLocations(it, binding.editSource.text.toString())
+            } else
+                stopWatchingSourceField()
+        }
+
+        binding.editDestination.setOnClickListener {
+            if (it.isFocused) {
+                startWatchingDestinationField()
+                getLocations(it, binding.editSource.text.toString())
+            } else
+                stopWatchingDestinationField()
+        }
+
         binding.editSource.setOnFocusChangeListener { view, isFocused ->
             if (isFocused) {
                 startWatchingSourceField()
@@ -116,6 +131,7 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
 
     private var sourceWatchJob: Job? = null
     private fun startWatchingSourceField() {
+        sourceWatchJob?.cancel()
         sourceWatchJob = binding.editSource.textChanges()
             .debounce(500)
             .onEach { getLocations(binding.editSource, binding.editSource.text.toString()) }
@@ -128,9 +144,15 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
 
     private var destinationWatchJob: Job? = null
     private fun startWatchingDestinationField() {
+        destinationWatchJob?.cancel()
         destinationWatchJob = binding.editDestination.textChanges()
             .debounce(500)
-            .onEach { getLocations(binding.editDestination, binding.editDestination.text.toString()) }
+            .onEach {
+                getLocations(
+                    binding.editDestination,
+                    binding.editDestination.text.toString()
+                )
+            }
             .launchIn(lifecycleScope)
     }
 

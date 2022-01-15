@@ -4,6 +4,7 @@ import com.mtm.uber_mimic.domain.exceptions.GetLocationsException
 import com.mtm.uber_mimic.domain.models.Location
 import com.mtm.uber_mimic.domain.repo.LocationRepository
 import com.mtm.uber_mimic.scheduler.SchedulerProvider
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -20,8 +21,10 @@ class DefaultGetLocationsUseCase(
                 else
                     locationRepository.searchLocations(keyword)
             } catch (throwable: Throwable) {
-                Timber.e(throwable)
-                throw GetLocationsException()
+                if (throwable !is CancellationException)
+                    throw GetLocationsException()
+                else
+                    throw throwable
             }
         }
     }
