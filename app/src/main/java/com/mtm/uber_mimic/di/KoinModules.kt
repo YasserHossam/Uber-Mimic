@@ -4,18 +4,26 @@ import com.mtm.uber_mimic.data.destinations.FoursquareApi
 import com.mtm.uber_mimic.data.destinations.FoursquareLocationRepository
 import com.mtm.uber_mimic.data.destinations.mappers.DefaultFoursquareLocationMapper
 import com.mtm.uber_mimic.data.destinations.mappers.FoursquareLocationMapper
+import com.mtm.uber_mimic.data.drivers.FirestoreDriverRepository
+import com.mtm.uber_mimic.data.drivers.mappers.DefaultFirestoreDriverMapper
+import com.mtm.uber_mimic.data.drivers.mappers.FirestoreDriverMapper
 import com.mtm.uber_mimic.data.sources.FirestoreLocationRepository
 import com.mtm.uber_mimic.data.sources.mappers.DefaultFirestoreLocationMapper
 import com.mtm.uber_mimic.data.sources.mappers.FirestoreLocationMapper
+import com.mtm.uber_mimic.domain.repo.DriversRepository
 import com.mtm.uber_mimic.domain.repo.LocationRepository
 import com.mtm.uber_mimic.domain.usecase.DefaultGetLocationsUseCase
+import com.mtm.uber_mimic.domain.usecase.DefaultGetNearestDriversUseCase
 import com.mtm.uber_mimic.domain.usecase.GetLocationsUseCase
+import com.mtm.uber_mimic.domain.usecase.GetNearestDriversUseCase
 import com.mtm.uber_mimic.scheduler.DefaultSchedulerProvider
 import com.mtm.uber_mimic.scheduler.SchedulerProvider
 import com.mtm.uber_mimic.tools.location.DefaultLocationHelper
 import com.mtm.uber_mimic.tools.location.LocationHelper
 import com.mtm.uber_mimic.ui.activities.RequestRideActivity
+import com.mtm.uber_mimic.ui.models.mappers.DefaultDriverModelMapper
 import com.mtm.uber_mimic.ui.models.mappers.DefaultLocationModelMapper
+import com.mtm.uber_mimic.ui.models.mappers.DriverModelMapper
 import com.mtm.uber_mimic.ui.models.mappers.LocationModelMapper
 import com.mtm.uber_mimic.ui.viewmodel.RequestRideViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -50,6 +58,9 @@ val requestRideModule = module {
         factory<FirestoreLocationMapper> { DefaultFirestoreLocationMapper }
         factory<LocationRepository>(named(sourceRepoName)) { FirestoreLocationRepository(get()) }
 
+        factory<FirestoreDriverMapper> { DefaultFirestoreDriverMapper }
+        factory<DriversRepository> { FirestoreDriverRepository(get()) }
+
         factory<FoursquareLocationMapper> { DefaultFoursquareLocationMapper }
         factory<LocationRepository>(named(destinationRepoName)) {
             FoursquareLocationRepository(get(), get(), get())
@@ -64,8 +75,13 @@ val requestRideModule = module {
             DefaultGetLocationsUseCase(get(named(destinationRepoName)), get())
         }
 
-        /* Mappers */
+        factory<GetNearestDriversUseCase> {
+            DefaultGetNearestDriversUseCase(get(), get())
+        }
+
+        /* UI Mappers */
         factory<LocationModelMapper> { DefaultLocationModelMapper }
+        factory<DriverModelMapper> { DefaultDriverModelMapper }
 
         /* ViewModel */
         viewModel {
@@ -73,7 +89,9 @@ val requestRideModule = module {
                 get(),
                 get(named(sourcesUseCase)),
                 get(named(destinationsUseCase)),
-                get()
+                get(),
+                get(),
+                get(),
             )
         }
     }

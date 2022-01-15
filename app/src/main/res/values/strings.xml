@@ -16,4 +16,7 @@
     <string name="destination">Destination</string>
     <string name="get_sources_error">Can\'t get source locations, please try again later</string>
     <string name="get_destinations_error">Can\'t get destination locations, please try again later</string>
+    <string name="request_rd">REQUEST RD</string>
+    <string name="source_missing">Please, fill in source field before proceeding</string>
+    <string name="unknown_driver_error">Can\'t find nearest driver, please try again later</string>
 </resources>

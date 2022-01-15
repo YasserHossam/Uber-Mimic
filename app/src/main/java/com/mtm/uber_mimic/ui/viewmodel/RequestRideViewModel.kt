@@ -5,18 +5,24 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mtm.uber_mimic.domain.usecase.GetLocationsUseCase
+import com.mtm.uber_mimic.domain.usecase.GetNearestDriversUseCase
 import com.mtm.uber_mimic.tools.location.LocationHelper
 import com.mtm.uber_mimic.tools.location.exceptions.LocationPermissionException
+import com.mtm.uber_mimic.ui.models.LocationModel
+import com.mtm.uber_mimic.ui.models.mappers.DriverModelMapper
 import com.mtm.uber_mimic.ui.models.mappers.LocationModelMapper
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
 
 class RequestRideViewModel(
     private val locationHelper: LocationHelper,
     private val getSourcesUseCase: GetLocationsUseCase,
     private val getDestinationsUseCase: GetLocationsUseCase,
-    private val locationModelMapper: LocationModelMapper
+    private val getNearestDriversUseCase: GetNearestDriversUseCase,
+    private val locationModelMapper: LocationModelMapper,
+    private val driverModelMapper: DriverModelMapper
 ) : ViewModel() {
 
     private val _currentLocationViewState: MutableLiveData<CurrentLocationViewState> by lazy {
@@ -76,10 +82,49 @@ class RequestRideViewModel(
         getDestinationsJob = viewModelScope.launch {
             try {
                 val sources = locationModelMapper.transform(getDestinationsUseCase(keyword))
-                _destinationsViewState.postValue(LocationViewState.Data(sources, LocationType.DESTINATION))
+                _destinationsViewState.postValue(
+                    LocationViewState.Data(
+                        sources,
+                        LocationType.DESTINATION
+                    )
+                )
             } catch (throwable: Throwable) {
                 if (throwable !is CancellationException)
                     _destinationsViewState.postValue(LocationViewState.Error(LocationType.DESTINATION))
+            }
+        }
+    }
+
+    private val _driversViewState: MutableLiveData<NearestDriversViewState> by lazy {
+        MutableLiveData()
+    }
+
+    val driversViewState: LiveData<NearestDriversViewState> = _driversViewState
+
+    private var getDriversJob: Job? = null
+
+    private var selectedSource: LocationModel? = null
+
+    fun selectSource(locationModel: LocationModel) {
+        selectedSource = locationModel
+    }
+
+    fun getNearestDrivers() {
+        val (_, _, lat, lng) = if (selectedSource == null) {
+            _driversViewState.postValue(NearestDriversViewState.Error.SourceMissing)
+            return
+        } else {
+            selectedSource!!
+        }
+        getDriversJob?.cancel()
+        _driversViewState.postValue(NearestDriversViewState.Loading)
+        getDriversJob = viewModelScope.launch {
+            try {
+                val drivers = driverModelMapper.transform(getNearestDriversUseCase(lat, lng))
+                _driversViewState.postValue(NearestDriversViewState.Data(drivers))
+            } catch (throwable: Throwable) {
+                if (throwable !is CancellationException)
+                    _driversViewState.postValue(NearestDriversViewState.Error.UnknownError)
             }
         }
     }

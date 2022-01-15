@@ -1,6 +1,5 @@
 package com.mtm.uber_mimic.ui.viewmodel
 
-import android.location.Location
 import com.mtm.uber_mimic.ui.models.LocationModel
 
 sealed class LocationViewState {

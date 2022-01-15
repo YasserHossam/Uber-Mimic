@@ -5,7 +5,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -18,10 +17,7 @@ import com.mtm.uber_mimic.R
 import com.mtm.uber_mimic.databinding.ActivityRequestRideBinding
 import com.mtm.uber_mimic.ui.*
 import com.mtm.uber_mimic.ui.adapter.LocationAdapter
-import com.mtm.uber_mimic.ui.viewmodel.CurrentLocationViewState
-import com.mtm.uber_mimic.ui.viewmodel.LocationType
-import com.mtm.uber_mimic.ui.viewmodel.LocationViewState
-import com.mtm.uber_mimic.ui.viewmodel.RequestRideViewModel
+import com.mtm.uber_mimic.ui.viewmodel.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
@@ -43,6 +39,7 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
 
     private val sourcesAdapter: LocationAdapter by lazy {
         LocationAdapter {
+            viewModel.selectSource(it)
             binding.editSource.apply {
                 stopWatchingSourceField()
                 setText(it.name)
@@ -142,6 +139,10 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
             } else
                 stopWatchingDestinationField()
         }
+
+        binding.btnRequestRide.setOnClickListener {
+            viewModel.getNearestDrivers()
+        }
     }
 
     private var sourceWatchJob: Job? = null
@@ -194,6 +195,10 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
 
         viewModel.destinationsViewState.observe(this) {
             setSourcesViewState(it)
+        }
+
+        viewModel.driversViewState.observe(this) {
+            setDriversViewState(it)
         }
     }
 
@@ -269,11 +274,46 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show()
     }
 
+    private fun setDriversViewState(viewState: NearestDriversViewState) {
+        hideLoadingState()
+        enableRequestDriverButton()
+        when (viewState) {
+            is NearestDriversViewState.Data -> setDriversDataState(viewState)
+            is NearestDriversViewState.Error -> setDriversErrorState(viewState)
+            NearestDriversViewState.Loading -> {
+                disableRequestDriverButton()
+                setLoadingState()
+            }
+        }
+    }
+
+    private fun setDriversDataState(viewState: NearestDriversViewState.Data) {
+        val drivers = viewState.drivers.map { it.toString() }
+        val message = drivers.joinToString(separator = "\n\n")
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun setDriversErrorState(viewState: NearestDriversViewState.Error) {
+        val message = if (viewState is NearestDriversViewState.Error.SourceMissing)
+            getString(R.string.source_missing)
+        else
+            getString(R.string.unknown_driver_error)
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
     private fun setLoadingState() {
         binding.progress.show()
     }
 
     private fun hideLoadingState() {
         binding.progress.hide()
+    }
+
+    private fun enableRequestDriverButton() {
+        binding.btnRequestRide.isEnabled = true
+    }
+
+    private fun disableRequestDriverButton() {
+        binding.btnRequestRide.isEnabled = false
     }
 }

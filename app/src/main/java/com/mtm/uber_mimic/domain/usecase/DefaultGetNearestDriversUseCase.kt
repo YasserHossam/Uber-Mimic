@@ -6,6 +6,7 @@ import com.mtm.uber_mimic.domain.repo.DriversRepository
 import com.mtm.uber_mimic.scheduler.SchedulerProvider
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -19,6 +20,7 @@ class DefaultGetNearestDriversUseCase(
             val drivers = try {
                 driversRepository.getDrivers()
             } catch (throwable: Throwable) {
+                Timber.e(throwable)
                 if (throwable !is CancellationException)
                     throw GetNearestDriversException()
                 throw throwable
