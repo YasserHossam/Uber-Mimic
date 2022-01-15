@@ -229,6 +229,8 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
     }
 
     private fun setLocationDataState(locationViewState: RequestRideViewState.LocationsData) {
+        if (locationViewState.locations.isEmpty())
+            return
         binding.recyclerLocation.show()
         if (locationViewState.type == LocationType.SOURCE) {
             sourcesAdapter.submitList(locationViewState.locations)
@@ -240,6 +242,8 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
     }
 
     private fun setDriversDataState(viewState: RequestRideViewState.NearestDriverData) {
+        if (viewState.drivers.isEmpty())
+            return
         val drivers = viewState.drivers.map { it.toString() }
         val message = StringBuilder().apply {
             append("Nearest Drivers: \n\n\n")

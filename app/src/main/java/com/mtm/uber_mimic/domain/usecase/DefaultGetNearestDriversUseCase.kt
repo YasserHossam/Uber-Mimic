@@ -23,7 +23,7 @@ class DefaultGetNearestDriversUseCase(
                 Timber.e(throwable)
                 if (throwable !is CancellationException)
                     throw GetNearestDriversException()
-                throw throwable
+                return@withContext emptyList()
             }
 
             val euclideanWithIdList = mutableListOf<EuclideanWithId>()

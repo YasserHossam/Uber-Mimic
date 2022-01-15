@@ -24,7 +24,7 @@ class DefaultGetLocationsUseCase(
                 if (throwable !is CancellationException)
                     throw GetLocationsException()
                 else
-                    throw throwable
+                    return@withContext emptyList()
             }
         }
     }
