@@ -1,5 +1,9 @@
 ext {
     //Versions
+    gradleToolsVersion = "7.0.4"
+
+    kotlinGradleVersion = "1.5.20"
+
     recyclerViewVersion = '1.2.1'
 
     coreKtxVersion = "1.7.0"
@@ -31,11 +35,18 @@ ext {
     retrofitVersion = "2.6.0"
 
     gsonVersion = "2.8.5"
+
     retrofitGsonVersion = "2.5.0"
+
     retrofitLoggingVersion = "3.12.0"
 
     //Support Libraries dependencies
     appDependencies = [
+
+            //Gradle
+            gradle            : "com.android.tools.build:gradle:${gradleToolsVersion}",
+            kotlinGradle      : "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinGradleVersion}",
+
             // Foundation
             coreKtx           : "androidx.core:core-ktx:${coreKtxVersion}",
             appCompat         : "androidx.appcompat:appcompat:${appCompatVersion}",
