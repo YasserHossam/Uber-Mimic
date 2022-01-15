@@ -185,20 +185,8 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
                 closeKeyboard()
             }
         }
-        viewModel.currentLocationViewState.observe(this) {
-            setCurrentLocationViewState(it)
-        }
-
-        viewModel.sourcesViewState.observe(this) {
-            setSourcesViewState(it)
-        }
-
-        viewModel.destinationsViewState.observe(this) {
-            setSourcesViewState(it)
-        }
-
-        viewModel.driversViewState.observe(this) {
-            setDriversViewState(it)
+        viewModel.requestRideViewState.observe(this) {
+            setViewState(it)
         }
     }
 
@@ -224,38 +212,23 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
             viewModel.getDestinations(currentQuery)
     }
 
-    private fun setCurrentLocationViewState(viewState: CurrentLocationViewState) {
+    private fun setViewState(viewState: RequestRideViewState) {
         hideLoadingState()
         when (viewState) {
-            is CurrentLocationViewState.Data -> setCurrentLocationDataState(viewState)
-            is CurrentLocationViewState.Error -> setCurrentLocationErrorState(viewState)
-            is CurrentLocationViewState.Loading -> setLoadingState()
+            is RequestRideViewState.CurrentLocationData -> setCurrentLocationDataState(viewState)
+            is RequestRideViewState.LocationsData -> setLocationDataState(viewState)
+            is RequestRideViewState.NearestDriverData -> setDriversDataState(viewState)
+            is RequestRideViewState.Error -> setErrorState(viewState)
+            is RequestRideViewState.Loading -> setLoadingState()
         }
     }
 
-    private fun setCurrentLocationDataState(viewState: CurrentLocationViewState.Data) {
+    private fun setCurrentLocationDataState(viewState: RequestRideViewState.CurrentLocationData) {
         mMap.addMarker(MarkerOptions().position(viewState.latLng).title("Your Location"))
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(viewState.latLng, 16f))
     }
 
-    private fun setCurrentLocationErrorState(viewState: CurrentLocationViewState.Error) {
-        val errorMessage = when (viewState) {
-            CurrentLocationViewState.Error.Permission -> getString(R.string.permission_error)
-            CurrentLocationViewState.Error.Unknown -> getString(R.string.unknown_error)
-        }
-        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
-    }
-
-    private fun setSourcesViewState(locationViewState: LocationViewState) {
-        hideLoadingState()
-        when (locationViewState) {
-            is LocationViewState.Data -> setLocationDataState(locationViewState)
-            is LocationViewState.Error -> setLocationErrorState(locationViewState)
-            is LocationViewState.Loading -> setLoadingState()
-        }
-    }
-
-    private fun setLocationDataState(locationViewState: LocationViewState.Data) {
+    private fun setLocationDataState(locationViewState: RequestRideViewState.LocationsData) {
         binding.recyclerLocation.show()
         if (locationViewState.type == LocationType.SOURCE) {
             sourcesAdapter.submitList(locationViewState.locations)
@@ -266,54 +239,46 @@ class RequestRideActivity : AppCompatActivity(), AndroidScopeComponent {
         }
     }
 
-    private fun setLocationErrorState(locationViewState: LocationViewState.Error) {
-        val text = if (locationViewState.type == LocationType.SOURCE)
-            getString(R.string.get_sources_error)
-        else
-            getString(R.string.get_destinations_error)
-        Toast.makeText(this, text, Toast.LENGTH_LONG).show()
-    }
-
-    private fun setDriversViewState(viewState: NearestDriversViewState) {
-        hideLoadingState()
-        enableRequestDriverButton()
-        when (viewState) {
-            is NearestDriversViewState.Data -> setDriversDataState(viewState)
-            is NearestDriversViewState.Error -> setDriversErrorState(viewState)
-            NearestDriversViewState.Loading -> {
-                disableRequestDriverButton()
-                setLoadingState()
-            }
-        }
-    }
-
-    private fun setDriversDataState(viewState: NearestDriversViewState.Data) {
+    private fun setDriversDataState(viewState: RequestRideViewState.NearestDriverData) {
         val drivers = viewState.drivers.map { it.toString() }
-        val message = drivers.joinToString(separator = "\n\n")
+        val message = StringBuilder().apply {
+            append("Nearest Drivers: \n\n\n")
+            append(drivers.joinToString(separator = "\n\n"))
+        }
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    private fun setDriversErrorState(viewState: NearestDriversViewState.Error) {
-        val message = if (viewState is NearestDriversViewState.Error.SourceMissing)
-            getString(R.string.source_missing)
-        else
-            getString(R.string.unknown_driver_error)
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    private fun setErrorState(viewState: RequestRideViewState.Error) {
+        val errorMessage = when (viewState) {
+            RequestRideViewState.Error.CurrentLocationError.Permission ->
+                getString(R.string.permission_error)
+
+            RequestRideViewState.Error.CurrentLocationError.Unknown ->
+                getString(R.string.get_current_location_error)
+
+            is RequestRideViewState.Error.LocationError -> {
+                if (viewState.type == LocationType.SOURCE)
+                    getString(R.string.get_sources_error)
+                else
+                    getString(R.string.get_destinations_error)
+            }
+
+            RequestRideViewState.Error.NearestDriverError.SourceMissing ->
+                getString(R.string.source_missing_error)
+
+            RequestRideViewState.Error.NearestDriverError.UnknownError ->
+                getString(R.string.get_nearest_driver_error)
+        }
+        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
     }
 
     private fun setLoadingState() {
+        binding.btnRequestRide.isEnabled = false
         binding.progress.show()
     }
 
     private fun hideLoadingState() {
-        binding.progress.hide()
-    }
-
-    private fun enableRequestDriverButton() {
         binding.btnRequestRide.isEnabled = true
-    }
-
-    private fun disableRequestDriverButton() {
-        binding.btnRequestRide.isEnabled = false
+        binding.progress.hide()
     }
 }

@@ -2,7 +2,7 @@
     <string name="app_name">uber-mimic</string>
     <string name="title_activity_request_ride">RequestRideActivity</string>
     <string name="permission_error">Can\'t retrieve your current location, please re run the app and accept the permissions</string>
-    <string name="unknown_error">Can\'t retrieve your location, please try again later</string>
+    <string name="get_current_location_error">Can\'t retrieve your location, please try again later</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -17,6 +17,6 @@
     <string name="get_sources_error">Can\'t get source locations, please try again later</string>
     <string name="get_destinations_error">Can\'t get destination locations, please try again later</string>
     <string name="request_rd">REQUEST RD</string>
-    <string name="source_missing">Please, fill in source field before proceeding</string>
-    <string name="unknown_driver_error">Can\'t find nearest driver, please try again later</string>
+    <string name="source_missing_error">Please, fill in source field before proceeding</string>
+    <string name="get_nearest_driver_error">Can\'t find nearest driver, please try again later</string>
 </resources>

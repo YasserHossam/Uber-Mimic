@@ -5,14 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.mtm.uber_mimic.domain.usecase.GetCurrentLocationUseCase
 import com.mtm.uber_mimic.domain.usecase.GetLocationsUseCase
 import com.mtm.uber_mimic.domain.usecase.GetNearestDriversUseCase
-import com.mtm.uber_mimic.domain.usecase.GetCurrentLocationUseCase
 import com.mtm.uber_mimic.ui.helper.PermissionHelper
 import com.mtm.uber_mimic.ui.models.LocationModel
 import com.mtm.uber_mimic.ui.models.mappers.DriverModelMapper
 import com.mtm.uber_mimic.ui.models.mappers.LocationModelMapper
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -26,96 +25,70 @@ class RequestRideViewModel(
     private val permissionHelper: PermissionHelper
 ) : ViewModel() {
 
-    private val _currentLocationViewState: MutableLiveData<CurrentLocationViewState> by lazy {
+    private val _viewState: MutableLiveData<RequestRideViewState> by lazy {
         MutableLiveData()
     }
-    val currentLocationViewState: LiveData<CurrentLocationViewState> = _currentLocationViewState
+    val requestRideViewState: LiveData<RequestRideViewState> = _viewState
 
     fun getCurrentLocation() {
-        _currentLocationViewState.postValue(CurrentLocationViewState.Loading)
+        _viewState.postValue(RequestRideViewState.Loading)
         viewModelScope.launch {
             try {
                 if (permissionHelper.isLocationPermissionsGranted()) {
                     val latLng = getCurrentLocationUseCase()
                     val googleLatLang = LatLng(latLng.lat, latLng.lng)
-                    _currentLocationViewState.postValue(CurrentLocationViewState.Data(googleLatLang))
+                    val state = RequestRideViewState.CurrentLocationData(googleLatLang)
+                    _viewState.postValue(state)
                 } else {
-                    val error = CurrentLocationViewState.Error.Permission
-                    _currentLocationViewState.postValue(error)
+                    val state = RequestRideViewState.Error.CurrentLocationError.Permission
+                    _viewState.postValue(state)
                 }
             } catch (throwable: Throwable) {
-                val error = CurrentLocationViewState.Error.Unknown
-                _currentLocationViewState.postValue(error)
+                val state = RequestRideViewState.Error.CurrentLocationError.Unknown
+                _viewState.postValue(state)
             }
         }
     }
-
-    private val _sourcesViewState: MutableLiveData<LocationViewState> by lazy {
-        MutableLiveData()
-    }
-
-    val sourcesViewState: LiveData<LocationViewState> = _sourcesViewState
 
     private var getSourcesJob: Job? = null
 
     fun getSources(keyword: String = "") {
         getSourcesJob?.cancel()
-        _sourcesViewState.postValue(LocationViewState.Loading)
+        _viewState.postValue(RequestRideViewState.Loading)
         getSourcesJob = viewModelScope.launch {
             try {
                 val sources = locationModelMapper.transform(getSourcesUseCase(keyword))
-                _sourcesViewState.postValue(LocationViewState.Data(sources, LocationType.SOURCE))
+                val state = RequestRideViewState.LocationsData(sources, LocationType.SOURCE)
+                _viewState.postValue(state)
             } catch (throwable: Throwable) {
-                if (throwable !is CancellationException)
-                    _sourcesViewState.postValue(LocationViewState.Error(LocationType.SOURCE))
+                val state = RequestRideViewState.Error.LocationError(LocationType.SOURCE)
+                _viewState.postValue(state)
             }
         }
     }
-
-    private val _destinationsViewState: MutableLiveData<LocationViewState> by lazy {
-        MutableLiveData()
-    }
-
-    val destinationsViewState: LiveData<LocationViewState> = _destinationsViewState
 
     private var getDestinationsJob: Job? = null
 
     fun getDestinations(keyword: String = "") {
         getDestinationsJob?.cancel()
-        _destinationsViewState.postValue(LocationViewState.Loading)
+        _viewState.postValue(RequestRideViewState.Loading)
         getDestinationsJob = viewModelScope.launch {
             try {
                 if (permissionHelper.isLocationPermissionsGranted()) {
                     val sources = locationModelMapper.transform(getDestinationsUseCase(keyword))
-                    _destinationsViewState.postValue(
-                        LocationViewState.Data(
-                            sources,
-                            LocationType.DESTINATION
-                        )
-                    )
+                    val state =
+                        RequestRideViewState.LocationsData(sources, LocationType.DESTINATION)
+                    _viewState.postValue(state)
                 } else {
-                    val error = CurrentLocationViewState.Error.Permission
-                    _currentLocationViewState.postValue(error)
-                    _destinationsViewState.postValue(
-                        LocationViewState.Data(
-                            emptyList(),
-                            LocationType.DESTINATION
-                        )
-                    )
+                    val state = RequestRideViewState.Error.CurrentLocationError.Unknown
+                    _viewState.postValue(state)
                 }
-
             } catch (throwable: Throwable) {
-                if (throwable !is CancellationException)
-                    _destinationsViewState.postValue(LocationViewState.Error(LocationType.DESTINATION))
+                val state = RequestRideViewState.Error.LocationError(LocationType.DESTINATION)
+                _viewState.postValue(state)
             }
         }
     }
-
-    private val _driversViewState: MutableLiveData<NearestDriversViewState> by lazy {
-        MutableLiveData()
-    }
-
-    val driversViewState: LiveData<NearestDriversViewState> = _driversViewState
 
     private var getDriversJob: Job? = null
 
@@ -127,22 +100,21 @@ class RequestRideViewModel(
 
     fun getNearestDrivers() {
         val (_, _, lat, lng) = if (selectedSource == null) {
-            _driversViewState.postValue(NearestDriversViewState.Error.SourceMissing)
+            val state = RequestRideViewState.Error.NearestDriverError.SourceMissing
+            _viewState.postValue(state)
             return
-        } else {
+        } else
             selectedSource!!
-        }
         getDriversJob?.cancel()
-        _driversViewState.postValue(NearestDriversViewState.Loading)
+        _viewState.postValue(RequestRideViewState.Loading)
         getDriversJob = viewModelScope.launch {
             try {
                 val drivers = driverModelMapper.transform(getNearestDriversUseCase(lat, lng))
-                _driversViewState.postValue(NearestDriversViewState.Data(drivers))
+                _viewState.postValue(RequestRideViewState.NearestDriverData(drivers))
             } catch (throwable: Throwable) {
-                if (throwable !is CancellationException)
-                    _driversViewState.postValue(NearestDriversViewState.Error.UnknownError)
+                val state = RequestRideViewState.Error.NearestDriverError.UnknownError
+                _viewState.postValue(state)
             }
         }
     }
-
 }
